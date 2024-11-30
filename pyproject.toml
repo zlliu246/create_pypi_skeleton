@@ -5,11 +5,11 @@ build-backend = "hatchling.build"
 
 [project]
 name = "create_pypi_skeleton"
-version = "0.0.1"
+version = "0.0.5"
 authors = [
     { name="Liu Zuo Lin", email="zlliu246@gmail.com" },
 ]
-description = "SOME DESCRIPTION"
+description = "This module automatically creates a PyPI project skeleton for you so you don't have to do this manually."
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
@@ -22,5 +22,5 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "YOUR HOMEPAGE LINK eg. https://github.com/github_username/project_name"
-Issues = "YOUR ISSUES LINK eg. https://github.com/github_username/project_name/issues"
+Homepage = "https://github.com/zlliu246/create_pypi_skeleton"
+Issues = "https://github.com/zlliu246/create_pypi_skeleton/issues"
