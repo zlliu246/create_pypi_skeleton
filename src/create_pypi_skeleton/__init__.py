@@ -2,7 +2,15 @@ import os
 from pathlib import Path
 from textwrap import dedent
 
-def create_pypi_skeleton(module_name: str) -> None:
+def create_pypi_skeleton(
+    module_name: str,
+    target_path: str = ".",
+    author_name: str = "YOUR_NAME",
+    author_email: str = "YOUR_EMAIL",
+    project_description: str = "SOME DESCRIPTION",
+    project_homepage: str = "https://github.com/github_username/project_name",
+    project_issues_link: str = "https://github.com/github_username/project_name/issues",  
+) -> None:
     """
     Automatically creates PyPI project skeleton in the current directory
 
@@ -23,9 +31,15 @@ def create_pypi_skeleton(module_name: str) -> None:
 
     Args:
         module_name (str): name of module. This will be your folder name.
+        target_path (str): where you want to create your project folder. Defualts to current directory "."
+        author_name (str): your name
+        author_email (str): your email
+        project_description (str): one-liner description of project
+        project_homepage (str): homepage of project repo eg. https://github.com/username/projectname
+        project_issues_link (str): issues page of project repo eg. https://github.com/username/projectname/issues
     """
     # create required folders
-    BASE_PATH: Path = Path(module_name)
+    BASE_PATH: Path = Path(target_path) / module_name
     SRC_PATH: Path = BASE_PATH / 'src'
     CODE_PATH: Path = SRC_PATH / module_name
     TESTS_PATH: Path = SRC_PATH / 'tests'
@@ -84,9 +98,9 @@ def create_pypi_skeleton(module_name: str) -> None:
             name = "{module_name}"
             version = "0.0.1"
             authors = [
-                {{ name="YOUR NAME", email="YOUR EMAIL" }},
+                {{ name="{author_name}", email="{author_email}" }},
             ]
-            description = "SOME DESCRIPTION"
+            description = "{project_description}"
             readme = "README.md"
             requires-python = ">=3.8"
             classifiers = [
@@ -99,8 +113,8 @@ def create_pypi_skeleton(module_name: str) -> None:
             ]
 
             [project.urls]
-            Homepage = "YOUR HOMEPAGE LINK eg. https://github.com/github_username/project_name"
-            Issues = "YOUR ISSUES LINK eg. https://github.com/github_username/project_name/issues"
+            Homepage = "{project_homepage}"
+            Issues = "{project_issues_link}"
         """))
 
     with open(BASE_PATH / "README.md", "w") as f:
