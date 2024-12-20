@@ -1,6 +1,9 @@
 import os
+import platform
 from pathlib import Path
 from textwrap import dedent
+
+IS_WINDOWS: bool = platform.system() in ("Windows")
 
 def create_pypi_skeleton(
     module_name: str,
@@ -68,8 +71,7 @@ def create_pypi_skeleton(
                 \"\"\"
                 Unit test cases go here
                 \"\"\"
-                def test_something(self):
-                    pass
+                pass
         """))
 
     with open(BASE_PATH / ".gitignore", "w") as f:
@@ -120,29 +122,30 @@ def create_pypi_skeleton(
     with open(BASE_PATH / "README.md", "w") as f:
         f.write(dedent(f"""
             # {module_name}
+            Short description of project
 
-            This file is the first thing users see when they visit PyPI or github
+            # Installation
+            ```
+            pip install {module_name}
+            ```
 
-            describe what your project does here
+            # Quickstart
+            ```python
+            # some code
+            ```
         """))
+
+    python_cmd: str = "python" if IS_WINDOWS else "python3"
 
     with open(BASE_PATH / "upload.py", "w") as f:
         f.write(dedent(f"""
             \"\"\"
-            This script:
-            - edits pyproject.toml
-                - finds the project version eg. 0.0.4
-                - increments it by 1 eg. 0.0.5
-                - if we don't do this, PyPI won't allow us to push this version
-                - this is because of an "existing version conflict"
-            - automatically pushes your project to PyPI
-            - though you still need to key in your PyPI API key manually for security purposes
-                       
-            Note: you need to "pip install build twine" before running this
-                - "build" allows us to build our PyPI project locally
-                - "twine" allows us to upload our project to PyPI
+            - finds and increments project version eg. 0.0.4 to 0.0.5 (else version conflict error)
+            - builds PyPI package locally into dist/* using "python -m build"
+            - uploads built PyPI package using "python -m twine upload dist/*" (need to key in your API key)
+
+            "pip install build twine" if you haven't already
             \"\"\"
-                       
             import os
             import re
 
@@ -162,16 +165,24 @@ def create_pypi_skeleton(
             with open('pyproject.toml', 'w') as f:
                 f.write(text)    
 
-            # TODO: this works for MacOS, but might not for Windows
             commands = [
                 'rm -rf ./dist',                    # removes current dist folder
-                'python3 -m build',                 # build PyPI project
-                'python3 -m twine upload dist/*'    # upload to PyPI
+                '{python_cmd} -m build',                 # build PyPI project
+                '{python_cmd} -m twine upload dist/*'    # upload to PyPI
             ]
 
             for command in commands:
                 print(command)
                 os.system(command)
         """))
+
+    with open(BASE_PATH / "test.py", "w") as f:
+        f.write(
+            dedent(f"""
+            from src.{module_name} import {module_name}
+
+            # do stuff with {module_name}
+            """)
+        )
 
     print(f"successfully created PyPI project skeleton for {module_name}")
