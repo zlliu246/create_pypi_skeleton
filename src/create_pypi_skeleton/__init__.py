@@ -66,6 +66,14 @@ def create_pypi_skeleton(
     with open(CODE_PATH / "__init__.py", "w") as f:
         pass
 
+    with open(CODE_PATH / f"{module_name}_main.py", "w") as f:
+        f.write(
+            dedent(f"""
+                def {module_name}():
+                    pass
+            """)
+        )
+
     with open(TESTS_PATH / "main.py", "w") as f:
         f.write(dedent("""
             import unittest
