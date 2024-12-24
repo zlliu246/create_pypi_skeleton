@@ -25,12 +25,15 @@ def create_pypi_skeleton(
                 __init__.py     # main folder where users import functions from
             tests/              
                 main.py         # unit tests go here
+                __init__.py
             __init__.py
         .gitignore              # files/folders written here are ignored by git
         LICENSE                 # license stuff
         pyproject.toml          # contains important config stuff for PyPI
         README.md               # tells users what your project is about
         upload.py               # helper script to upload project to PyPI
+        test.py                 # testing script to run
+        tests.py                # import and run tests in /src/testing123/tests/
 
     Args:
         module_name (str): name of module. This will be your folder name.
@@ -74,6 +77,9 @@ def create_pypi_skeleton(
                 pass
         """))
 
+    with open(TESTS_PATH / "__init__.py", "w") as f:
+        pass
+
     with open(BASE_PATH / ".gitignore", "w") as f:
         f.write(dedent("""
             __pycache__
@@ -81,10 +87,8 @@ def create_pypi_skeleton(
             */__pycache__/*
             .DS_Store
             *.pyc
-            dist/
-            */dist
+            dist
             venv
-            */venv
         """))
 
     with open(BASE_PATH / "LICENSE", "w") as f:
@@ -148,19 +152,21 @@ def create_pypi_skeleton(
             \"\"\"
             import os
             import re
+            import sys
 
             with open('pyproject.toml') as f:
                 text = f.read()
 
-            old_version: str = re.findall('version = "(.*?)"', text)[0]     # "0.0.4"
-                       
-            major, minor, patch = old_version.split('.')            # major="0" minor="0" patch="4"
-                       
-            new_patch = int(patch) + 1
-            
-            new_version = f'{{major}}.{{minor}}.{{new_patch}}'      # "0.0.5"
-                       
-            text = re.sub(old_version, new_version, text)
+            # "python -m upload.py --nowrite" if you don't want this script to increment version in pyproject.toml
+            if "--nowrite" in sys.argv:
+                print("incrementing version by 1 in pyproject.toml")
+                old_version: str = re.findall('version = "(.*?)"', text)[0]     # "0.0.4"
+                major, minor, patch = old_version.split('.')                    # major="0" minor="0" patch="4"
+                new_patch = int(patch) + 1
+                new_version = f'{{major}}.{{minor}}.{{new_patch}}'                    # "0.0.5"
+                text = re.sub(old_version, new_version, text)
+                with open('pyproject.toml', 'w') as f:
+                    f.write(text)   
 
             with open('pyproject.toml', 'w') as f:
                 f.write(text)    
@@ -182,6 +188,17 @@ def create_pypi_skeleton(
             from src.{module_name} import {module_name}
 
             # do stuff with {module_name}
+            """)
+        )
+
+    with open(BASE_PATH / "tests.py", "w") as f:
+        f.write(
+            dedent(f"""
+            import unittest
+            from src.tests.main import TestMain
+
+            if __name__ == "__main__":
+                   unittest.main()
             """)
         )
 
